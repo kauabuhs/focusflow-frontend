@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { useRouter } from 'vue-router'
+import AppLayout from '@/layouts/AppLayout.vue'
+
+const publicRoutes = ['/login', '/register', '/forgot-password']
+const router = useRouter()
+
+const isPublicRoute = () => publicRoutes.includes(router.currentRoute.value.path)
 </script>
 
 <template>
-  <HelloWorld />
+  <AppLayout v-if="!isPublicRoute()">
+    <RouterView />
+  </AppLayout>
+  <RouterView v-else />
 </template>
