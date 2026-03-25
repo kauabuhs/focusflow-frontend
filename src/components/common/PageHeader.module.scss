@@ -1,0 +1,39 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $spacing-lg;
+
+  @include breakpoint-down('md') {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.page-header__text {
+  min-width: 0;
+}
+
+.page-header__title {
+  @include heading-2;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.page-header__subtitle {
+  @include body-small;
+  color: $color-text-secondary;
+  margin: $spacing-xs 0 0;
+}
+
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+

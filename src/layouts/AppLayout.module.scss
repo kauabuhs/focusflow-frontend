@@ -8,7 +8,21 @@
 .app-layout {
   display: flex;
   height: 100vh;
-  background-color: $color-bg;
+  background-color: $color-bg-secondary;
+  position: relative;
+
+  &__overlay {
+    display: none;
+
+    @include breakpoint-down('md') {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(2px);
+      z-index: 40;
+    }
+  }
 
   // ──────────────────────────────────────────────────────────────────────
   // SIDEBAR ELEMENT
@@ -21,9 +35,10 @@
     @include flex-column;
     box-shadow: $shadow-sm;
     transition: all $transition-base;
+    z-index: 50;
 
     @include breakpoint-down('md') {
-      position: absolute;
+      position: fixed;
       left: 0;
       top: 0;
       height: 100vh;
@@ -34,24 +49,97 @@
         transform: translateX(0);
       }
     }
+
+    // Desktop collapse state
+    &--collapsed {
+      width: 80px;
+
+      @include breakpoint-down('md') {
+        // Mobile: no collapse, always full width when open
+        @media (max-width: 768px) {
+          width: 256px;
+        }
+      }
+    }
   }
 
   // ──── Brand Section ────
   &__brand {
     padding: $spacing-xl $spacing-lg;
     border-bottom: 1px solid $color-border;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    transition: all $transition-base;
+
+    .app-layout__sidebar--collapsed & {
+      flex-direction: column;
+      align-items: center;
+      padding: $spacing-lg $spacing-md;
+    }
   }
 
   &__brand-title {
     @include heading-3;
     color: $color-primary;
     margin-bottom: $spacing-sm;
+    transition: all $transition-base;
+
+    .app-layout__sidebar--collapsed & {
+      display: none;
+    }
   }
 
   &__brand-subtitle {
     @include body-small;
     color: $color-text-secondary;
     font-weight: $font-weight-medium;
+    transition: all $transition-base;
+
+    .app-layout__sidebar--collapsed & {
+      display: none;
+    }
+  }
+
+  // ──── Collapse Button ────
+  &__collapse-btn {
+    @include button-ghost;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all $transition-base;
+    border: 1px solid $color-border;
+    background: $color-white;
+
+    @include breakpoint-down('md') {
+      display: none;
+    }
+
+    &:hover {
+      background-color: $color-gray-100;
+      border-color: $color-primary-light;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__collapse-icon {
+    width: 18px;
+    height: 18px;
+    color: $color-text-secondary;
+    transition: all $transition-base;
+
+    .app-layout__sidebar--collapsed & {
+      transform: scaleX(-1);
+    }
   }
 
   // ──── Navigation ────
@@ -62,6 +150,12 @@
     flex-direction: column;
     gap: $spacing-sm;
     overflow-y: auto;
+    transition: all $transition-base;
+    
+    .app-layout__sidebar--collapsed & {
+      padding: $spacing-md;
+      justify-content: flex-start;
+    }
     
     &-item {
       @include button-base;
@@ -90,17 +184,47 @@
           background-color: rgba($color-primary, 0.15);
         }
       }
+
+      // Collapsed state
+      &--collapsed {
+        justify-content: center;
+        padding: $spacing-md;
+        position: relative;
+
+        &:hover::after {
+          content: attr(title);
+          position: absolute;
+          left: 100%;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: rgba($color-text, 0.9);
+          color: $color-white;
+          padding: $spacing-sm $spacing-md;
+          border-radius: $radius-sm;
+          font-size: $font-size-xs;
+          white-space: nowrap;
+          margin-left: $spacing-md;
+          z-index: 100;
+          pointer-events: none;
+        }
+      }
     }
 
     &-icon {
       width: 20px;
       height: 20px;
       flex-shrink: 0;
+      transition: all $transition-base;
     }
 
     &-label {
       flex: 1;
       text-align: left;
+      transition: all $transition-base;
+
+      .app-layout__sidebar--collapsed & {
+        display: none;
+      }
     }
   }
 
@@ -111,6 +235,13 @@
     flex-direction: column;
     gap: $spacing-md;
     border-top: 1px solid $color-border;
+    transition: all $transition-base;
+
+    &--collapsed {
+      padding: $spacing-md;
+      gap: $spacing-sm;
+      align-items: center;
+    }
   }
 
   &__focus-btn {
@@ -122,11 +253,41 @@
     font-weight: $font-weight-semibold;
     box-shadow: $shadow-md;
     transition: all $transition-base;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
 
     &:hover:not(:disabled) {
       box-shadow: $shadow-lg;
       transform: translateY(-2px);
     }
+
+    &--collapsed {
+      width: auto;
+      min-width: 44px;
+      min-height: 44px;
+      padding: $spacing-md;
+      justify-content: center;
+    }
+  }
+
+  &__user-dropdown {
+    position: relative;
+  }
+
+  &__avatar-gradient {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(135deg, $color-secondary, $color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-white;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 
   &__user-profile {
@@ -139,9 +300,33 @@
     transition: all $transition-base;
     width: 100%;
     cursor: pointer;
+    position: relative;
 
     &:hover {
       background-color: $color-gray-100;
+    }
+
+    &--collapsed {
+      width: auto;
+      justify-content: center;
+      padding: $spacing-md;
+
+      &:hover::after {
+        content: 'Perfil';
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba($color-text, 0.9);
+        color: $color-white;
+        padding: $spacing-sm $spacing-md;
+        border-radius: $radius-sm;
+        font-size: $font-size-xs;
+        white-space: nowrap;
+        margin-left: $spacing-md;
+        z-index: 100;
+        pointer-events: none;
+      }
     }
   }
 
@@ -149,6 +334,8 @@
     width: 36px;
     height: 36px;
     flex-shrink: 0;
+    border-radius: $radius-md;
+    overflow: hidden;
   }
 
   &__user-info {
@@ -168,6 +355,82 @@
     font-size: $font-size-xs;
     color: $color-text-secondary;
     @include text-truncate;
+  }
+
+  &__chevron {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: $color-text-light;
+  }
+
+  &__dropdown {
+    position: absolute;
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-xl;
+    z-index: 100;
+    overflow: hidden;
+    min-width: 220px;
+  }
+
+  &__dropdown--sidebar {
+    left: 0;
+    right: 0;
+    bottom: calc(100% + 8px);
+    min-width: auto;
+  }
+
+  &__dropdown--header {
+    right: 0;
+    top: calc(100% + 8px);
+  }
+
+  &__dropdown-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid $color-border;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text;
+  }
+
+  &__dropdown-divider {
+    height: 1px;
+    background: $color-border-light;
+  }
+
+  &__dropdown-item {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    color: $color-text;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    transition: background-color $transition-fast, color $transition-fast;
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+  }
+
+  &__dropdown-item--danger {
+    color: $color-danger;
+
+    &:hover {
+      background-color: rgba($color-danger, 0.08);
+    }
+  }
+
+  &__dropdown-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
   }
 
   // ──────────────────────────────────────────────────────────────────────
@@ -193,6 +456,42 @@
     padding: 0 $spacing-2xl;
     gap: $spacing-lg;
     box-shadow: $shadow-sm;
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__menu-btn {
+    display: none;
+    @include button-ghost;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: $radius-md;
+    border: 1px solid $color-border;
+    background: $color-white;
+
+    &:hover {
+      background: $color-gray-50;
+      border-color: $color-primary-light;
+    }
+
+    @include breakpoint-down('md') {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &__menu-icon {
+    width: 20px;
+    height: 20px;
+    color: $color-text-secondary;
   }
 
   &__header-search {
@@ -237,6 +536,13 @@
     display: flex;
     align-items: center;
     gap: $spacing-sm;
+  }
+
+  &__notification-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   &__icon-btn {
@@ -306,6 +612,9 @@
 
   &__content-wrapper {
     padding: $spacing-2xl;
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
 
     @include breakpoint-down('md') {
       padding: $spacing-xl;
@@ -324,7 +633,8 @@
 .search-wrapper {
   position: relative;
   flex: 1;
-  max-width: 320px;
+  max-width: 560px;
+  min-width: 0;
 }
 
 // ============================================================================

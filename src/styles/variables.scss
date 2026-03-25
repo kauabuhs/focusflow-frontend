@@ -3,14 +3,14 @@
 // ============================================================================
 
 // Primary Colors
-$color-primary: #7c3aed;
-$color-primary-light: #a78bfa;
-$color-primary-dark: #6d28d9;
+$color-primary: #2563eb; // blue-600
+$color-primary-light: #dbeafe; // blue-100
+$color-primary-dark: #1d4ed8; // blue-700
 
 // Secondary Colors
-$color-secondary: #0ea5e9;
-$color-secondary-light: #38bdf8;
-$color-secondary-dark: #0284c7;
+$color-secondary: #7c3aed; // violet-600 (accent/gradient)
+$color-secondary-light: #a78bfa; // violet-400
+$color-secondary-dark: #6d28d9; // violet-700
 
 // Neutral Colors
 $color-white: #ffffff;
@@ -35,12 +35,12 @@ $color-info: #3b82f6;
 
 // Semantic Colors
 $color-bg: $color-white;
-$color-bg-secondary: $color-gray-50;
+$color-bg-secondary: #f8fafc; // slate-50-ish, matches app canvas
 $color-text: $color-gray-900;
-$color-text-secondary: $color-gray-600;
+$color-text-secondary: #64748b; // slate-500
 $color-text-light: $color-gray-400;
-$color-border: $color-gray-200;
-$color-border-light: $color-gray-100;
+$color-border: #e2e8f0; // slate-200
+$color-border-light: #f1f5f9; // slate-100
 
 // ============================================================================
 // SPACING

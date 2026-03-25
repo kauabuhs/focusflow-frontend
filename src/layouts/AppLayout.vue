@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { onClickOutside } from '@vueuse/core'
 import {
   LayoutDashboard,
   CheckSquare,
@@ -14,6 +15,10 @@ import {
   Search,
   LogOut,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
 } from 'lucide-vue-next'
 import styles from './AppLayout.module.scss'
 
@@ -49,8 +54,12 @@ const route = useRoute()
 const router = useRouter()
 const searchQuery = ref('')
 const notificationCount = ref(3)
+const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
 const dropdownOpen = ref(false)
 const userDropdownOpen = ref(false)
+const sidebarUserMenuEl = ref<HTMLElement | null>(null)
+const headerUserMenuEl = ref<HTMLElement | null>(null)
 
 const currentUser = ref<User>({
   name: 'Alex Rivera',
@@ -68,6 +77,7 @@ const hasNotifications = computed(() => notificationCount.value > 0)
 
 function navigate(to: string): void {
   router.push(to)
+  sidebarOpen.value = false
   dropdownOpen.value = false
   userDropdownOpen.value = false
 }
@@ -95,17 +105,86 @@ function toggleUserDropdown(): void {
   userDropdownOpen.value = !userDropdownOpen.value
   dropdownOpen.value = false
 }
+
+function toggleSidebar(): void {
+  sidebarOpen.value = !sidebarOpen.value
+  dropdownOpen.value = false
+  userDropdownOpen.value = false
+}
+
+function toggleCollapse(): void {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  localStorage.setItem('sidebarCollapsed', sidebarCollapsed.value.toString())
+  dropdownOpen.value = false
+  userDropdownOpen.value = false
+}
+
+function closeAllOverlays(): void {
+  sidebarOpen.value = false
+  dropdownOpen.value = false
+  userDropdownOpen.value = false
+}
+
+function onKeydown(e: KeyboardEvent): void {
+  if (e.key === 'Escape') closeAllOverlays()
+}
+
+watch(
+  () => route.path,
+  () => {
+    sidebarOpen.value = false
+    dropdownOpen.value = false
+    userDropdownOpen.value = false
+  }
+)
+
+onClickOutside(sidebarUserMenuEl, () => {
+  dropdownOpen.value = false
+})
+
+onClickOutside(headerUserMenuEl, () => {
+  userDropdownOpen.value = false
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+  const saved = localStorage.getItem('sidebarCollapsed')
+  if (saved) sidebarCollapsed.value = saved === 'true'
+})
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
   <div :class="styles['app-layout']">
+    <div
+      v-if="sidebarOpen"
+      :class="styles['app-layout__overlay']"
+      @click="closeAllOverlays"
+    />
     <!-- ═════════════════════════════════════ SIDEBAR ═════════════════════════════════════ -->
-    <aside :class="styles['app-layout__sidebar']">
+    <aside
+      :class="[
+        styles['app-layout__sidebar'],
+        sidebarOpen && styles['app-layout__sidebar--open'],
+        sidebarCollapsed && styles['app-layout__sidebar--collapsed'],
+      ]"
+    >
       
       <!-- Brand -->
       <div :class="styles['app-layout__brand']">
         <h1 :class="styles['app-layout__brand-title']">FocusFlow</h1>
         <p :class="styles['app-layout__brand-subtitle']">Productivity Platform</p>
+        
+        <!-- Collapse Button (Desktop only) -->
+        <button
+          @click="toggleCollapse"
+          :class="styles['app-layout__collapse-btn']"
+          :aria-label="sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'"
+          :title="sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'"
+        >
+          <ChevronLeft v-if="!sidebarCollapsed" :class="styles['app-layout__collapse-icon']" />
+          <ChevronRight v-else :class="styles['app-layout__collapse-icon']" />
+        </button>
       </div>
 
       <!-- Navigation -->
@@ -116,7 +195,8 @@ function toggleUserDropdown(): void {
           @click="navigate(item.to)"
           :class="[
             styles['app-layout__nav-item'],
-            isActive(item.to) && styles['app-layout__nav-item--active']
+            isActive(item.to) && styles['app-layout__nav-item--active'],
+            sidebarCollapsed && styles['app-layout__nav-item--collapsed'],
           ]"
           :title="item.label"
         >
@@ -126,98 +206,74 @@ function toggleUserDropdown(): void {
       </nav>
 
       <!-- Sidebar Footer -->
-      <div :class="styles['app-layout__sidebar-footer']">
+      <div :class="[
+        styles['app-layout__sidebar-footer'],
+        sidebarCollapsed && styles['app-layout__sidebar-footer--collapsed'],
+      ]">
         <!-- Focus Session Button -->
         <button
           @click="startFocusSession"
-          :class="styles['app-layout__focus-btn']"
+          :class="[
+            styles['app-layout__focus-btn'],
+            sidebarCollapsed && styles['app-layout__focus-btn--collapsed'],
+          ]"
+          :title="sidebarCollapsed ? 'Iniciar sessão de foco' : undefined"
         >
           <Play class="w-4 h-4" />
-          Focus Session
+          <span v-if="!sidebarCollapsed">Focus Session</span>
         </button>
 
         <!-- User Profile Dropdown -->
-        <div>
+        <div ref="sidebarUserMenuEl" :class="styles['app-layout__user-dropdown']">
           <button
             @click="toggleDropdown"
-            :class="styles['app-layout__user-profile']"
+            :class="[
+              styles['app-layout__user-profile'],
+              sidebarCollapsed && styles['app-layout__user-profile--collapsed'],
+            ]"
+            aria-haspopup="menu"
+            :aria-expanded="dropdownOpen"
           >
             <!-- Avatar -->
             <div :class="styles['app-layout__user-avatar']">
-              <div style="
-                width: 100%;
-                height: 100%;
-                border-radius: 8px;
-                background: linear-gradient(135deg, #7c3aed, #0ea5e9);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 12px;
-                font-weight: 600;
-              ">
+              <div :class="styles['app-layout__avatar-gradient']">
                 {{ currentUser.initials }}
               </div>
             </div>
 
             <!-- User Info -->
-            <div :class="styles['app-layout__user-info']">
+            <div v-if="!sidebarCollapsed" :class="styles['app-layout__user-info']">
               <p :class="styles['app-layout__user-name']">{{ currentUser.name }}</p>
               <p :class="styles['app-layout__user-plan']">{{ currentUser.plan }}</p>
             </div>
 
-            <ChevronDown style="width: 16px; height: 16px; flex-shrink: 0;" />
+            <ChevronDown v-if="!sidebarCollapsed" :class="styles['app-layout__chevron']" />
           </button>
 
           <!-- Dropdown Menu -->
-          <div v-if="dropdownOpen" style="
-            position: absolute;
-            bottom: -120px;
-            left: 16px;
-            right: 16px;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            overflow: hidden;
-          ">
+          <div
+            v-if="dropdownOpen"
+            :class="[
+              styles['app-layout__dropdown'],
+              styles['app-layout__dropdown--sidebar'],
+            ]"
+          >
             <button
               @click="navigate('/settings')"
-              style="
-                width: 100%;
-                padding: 12px 16px;
-                border: none;
-                background: transparent;
-                text-align: left;
-                font-size: 14px;
-                cursor: pointer;
-                transition: background-color 150ms;
-              "
-              @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#f3f4f6'"
-              @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+              :class="styles['app-layout__dropdown-item']"
             >
-              <Settings style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+              <Settings :class="styles['app-layout__dropdown-icon']" />
               Configurações
             </button>
-            <div style="height: 1px; background-color: #e5e7eb;" />
+            <div :class="styles['app-layout__dropdown-divider']" />
             <button
               @click="logout"
-              style="
-                width: 100%;
-                padding: 12px 16px;
-                border: none;
-                background: transparent;
-                text-align: left;
-                font-size: 14px;
-                cursor: pointer;
-                color: #ef4444;
-                transition: background-color 150ms;
-              "
-              @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2'"
-              @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+              :class="[
+                styles['app-layout__dropdown-item'],
+                styles['app-layout__dropdown-item--danger'],
+              ]"
             >
-              <LogOut style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+              <LogOut :class="styles['app-layout__dropdown-icon']" />
               Sair
             </button>
           </div>
@@ -230,23 +286,33 @@ function toggleUserDropdown(): void {
       
       <!-- Top Bar/Header -->
       <header :class="styles['app-layout__header']">
-        
-        <!-- Search -->
-        <div :class="styles['search-wrapper']">
-          <Search :class="styles['app-layout__search-icon']" />
-          <input
-            v-model="searchQuery"
-            placeholder="Buscar tarefas..."
-            @keydown="handleSearch"
-            :class="styles['app-layout__search-input']"
-          />
+        <div :class="styles['app-layout__header-left']">
+          <button
+            :class="styles['app-layout__menu-btn']"
+            @click="toggleSidebar"
+            aria-label="Toggle sidebar"
+          >
+            <Menu v-if="!sidebarOpen" :class="styles['app-layout__menu-icon']" />
+            <X v-else :class="styles['app-layout__menu-icon']" />
+          </button>
+
+          <!-- Search -->
+          <div :class="styles['search-wrapper']">
+            <Search :class="styles['app-layout__search-icon']" />
+            <input
+              v-model="searchQuery"
+              placeholder="Buscar tarefas..."
+              @keydown="handleSearch"
+              :class="styles['app-layout__search-input']"
+            />
+          </div>
         </div>
 
         <!-- Right Actions -->
         <div :class="styles['app-layout__header-actions']">
           <!-- Notifications Button -->
-          <button :class="styles['app-layout__icon-btn']">
-            <div style="position: relative;">
+          <button :class="styles['app-layout__icon-btn']" aria-label="Notifications">
+            <div :class="styles['app-layout__notification-wrap']">
               <Bell :class="styles['app-layout__icon']" />
               <div
                 v-if="hasNotifications"
@@ -258,7 +324,7 @@ function toggleUserDropdown(): void {
           </button>
 
           <!-- Help Button -->
-          <button :class="styles['app-layout__icon-btn']">
+          <button :class="styles['app-layout__icon-btn']" aria-label="Help">
             <HelpCircle :class="styles['app-layout__icon']" />
           </button>
 
@@ -266,87 +332,43 @@ function toggleUserDropdown(): void {
           <div :class="styles['app-layout__divider']" />
 
           <!-- User Avatar Dropdown -->
-          <div style="position: relative;">
+          <div ref="headerUserMenuEl" :class="styles['app-layout__user-dropdown']">
             <button
               @click="toggleUserDropdown"
               :class="styles['app-layout__header-avatar']"
+              aria-haspopup="menu"
+              :aria-expanded="userDropdownOpen"
             >
-              <div style="
-                width: 100%;
-                height: 100%;
-                border-radius: 6px;
-                background: linear-gradient(135deg, #7c3aed, #0ea5e9);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-size: 12px;
-                font-weight: 600;
-              ">
+              <div :class="styles['app-layout__avatar-gradient']">
                 {{ currentUser.initials }}
               </div>
             </button>
 
             <!-- Dropdown Menu -->
-            <div v-if="userDropdownOpen" style="
-              position: absolute;
-              top: 100%;
-              right: 0;
-              margin-top: 8px;
-              background: white;
-              border: 1px solid #e5e7eb;
-              border-radius: 8px;
-              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-              z-index: 100;
-              min-width: 200px;
-              overflow: hidden;
-            ">
-              <div style="
-                padding: 12px 16px;
-                border-bottom: 1px solid #e5e7eb;
-                font-weight: 500;
-                font-size: 14px;
-                color: #111827;
-              ">
-                {{ currentUser.name }}
-              </div>
+            <div
+              v-if="userDropdownOpen"
+              :class="[
+                styles['app-layout__dropdown'],
+                styles['app-layout__dropdown--header'],
+              ]"
+            >
+              <div :class="styles['app-layout__dropdown-header']">{{ currentUser.name }}</div>
               <button
                 @click="navigate('/settings')"
-                style="
-                  width: 100%;
-                  padding: 12px 16px;
-                  border: none;
-                  background: transparent;
-                  text-align: left;
-                  font-size: 14px;
-                  cursor: pointer;
-                  color: #111827;
-                  transition: background-color 150ms;
-                "
-                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#f3f4f6'"
-                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+                :class="styles['app-layout__dropdown-item']"
               >
-                <Settings style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+                <Settings :class="styles['app-layout__dropdown-icon']" />
                 Configurações
               </button>
-              <div style="height: 1px; background-color: #e5e7eb;" />
+              <div :class="styles['app-layout__dropdown-divider']" />
               <button
                 @click="logout"
-                style="
-                  width: 100%;
-                  padding: 12px 16px;
-                  border: none;
-                  background: transparent;
-                  text-align: left;
-                  font-size: 14px;
-                  cursor: pointer;
-                  color: #ef4444;
-                  transition: background-color 150ms;
-                "
-                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2'"
-                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+                :class="[
+                  styles['app-layout__dropdown-item'],
+                  styles['app-layout__dropdown-item--danger'],
+                ]"
               >
-                <LogOut style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+                <LogOut :class="styles['app-layout__dropdown-icon']" />
                 Sair
               </button>
             </div>
