@@ -1,0 +1,93 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ============================================================================
+// CARD COMPONENT - BEM BLOCK
+// ============================================================================
+
+.card {
+  @include card;
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: HOVER EFFECT
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--hover {
+    @include card-hover;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: ELEVATION
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--elevated {
+    box-shadow: $shadow-lg;
+  }
+
+  &--flat {
+    box-shadow: none;
+    border: 1px solid $color-border-light;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ELEMENTS: HEADER, BODY, FOOTER
+  // ──────────────────────────────────────────────────────────────────────
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-lg;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__title {
+    @include heading-4;
+    color: $color-text;
+    margin: 0;
+  }
+
+  &__subtitle {
+    @include body-small;
+    color: $color-text-secondary;
+    margin: 0;
+    margin-top: $spacing-xs;
+  }
+
+  &__body {
+    flex: 1;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: $spacing-lg;
+    padding-top: $spacing-lg;
+    border-top: 1px solid $color-border;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // RESPONSIVE
+  // ──────────────────────────────────────────────────────────────────────
+
+  @include breakpoint-down('sm') {
+    padding: $spacing-lg;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-md;
+    }
+
+    &__footer {
+      flex-direction: column;
+      gap: $spacing-md;
+
+      > * {
+        width: 100%;
+      }
+    }
+  }
+}

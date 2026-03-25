@@ -1,0 +1,80 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ============================================================================
+// INPUT COMPONENT - BEM BLOCK
+// ============================================================================
+
+.input-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.input-label {
+  @include label-text;
+  color: $color-text-secondary;
+
+  &--required::after {
+    content: ' *';
+    color: #ef4444;
+  }
+}
+
+.input {
+  @include input-base;
+  
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: SIZES
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--sm {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-sm;
+    height: 32px;
+  }
+
+  &--md {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-md;
+    height: 40px;
+  }
+
+  &--lg {
+    padding: $spacing-lg $spacing-lg;
+    font-size: $font-size-md;
+    height: 48px;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: STATES
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--error {
+    border-color: #ef4444;
+
+    &:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  &--disabled {
+    background-color: $color-gray-100;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.input-error {
+  font-size: $font-size-xs;
+  color: #ef4444;
+  margin-top: $spacing-xs;
+}
+
+.input-hint {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: $spacing-xs;
+}

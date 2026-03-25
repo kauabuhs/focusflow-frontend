@@ -1,0 +1,102 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ============================================================================
+// BUTTON COMPONENT - BEM BLOCK
+// ============================================================================
+
+.button {
+  @include button-base;
+  
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: VARIANTS
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--primary {
+    @include button-primary;
+  }
+
+  &--secondary {
+    @include button-secondary;
+  }
+
+  &--ghost {
+    @include button-ghost;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: SIZES
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--sm {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-size-xs;
+    height: 32px;
+  }
+
+  &--md {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-sm;
+    height: 40px;
+  }
+
+  &--lg {
+    padding: $spacing-lg $spacing-xl;
+    font-size: $font-size-md;
+    height: 48px;
+  }
+
+  &--xl {
+    padding: $spacing-xl $spacing-2xl;
+    font-size: $font-size-md;
+    height: 56px;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: FULLWIDTH
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--fullwidth {
+    width: 100%;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: DISABLED STATE
+  // ──────────────────────────────────────────────────────────────────────
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: LOADING STATE
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid $color-gray-300;
+      border-radius: 50%;
+      border-top-color: $color-primary;
+      animation: spin 600ms linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

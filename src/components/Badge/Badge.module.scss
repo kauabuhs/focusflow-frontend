@@ -1,0 +1,116 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ============================================================================
+// BADGE COMPONENT - BEM BLOCK
+// ============================================================================
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: VARIANTS
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--primary {
+    background-color: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+
+  &--secondary {
+    background-color: rgba($color-secondary, 0.1);
+    color: $color-secondary;
+  }
+
+  &--success {
+    background-color: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+
+  &--warning {
+    background-color: rgba($color-warning, 0.1);
+    color: $color-warning;
+  }
+
+  &--danger {
+    background-color: rgba($color-danger, 0.1);
+    color: $color-danger;
+  }
+
+  &--info {
+    background-color: rgba($color-info, 0.1);
+    color: $color-info;
+  }
+
+  &--gray {
+    background-color: $color-gray-100;
+    color: $color-gray-600;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: SOLID VARIANT
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--solid-primary {
+    background-color: $color-primary;
+    color: white;
+  }
+
+  &--solid-secondary {
+    background-color: $color-secondary;
+    color: white;
+  }
+
+  &--solid-success {
+    background-color: $color-success;
+    color: white;
+  }
+
+  &--solid-warning {
+    background-color: $color-warning;
+    color: white;
+  }
+
+  &--solid-danger {
+    background-color: $color-danger;
+    color: white;
+  }
+
+  &--solid-info {
+    background-color: $color-info;
+    color: white;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MODIFIERS: SIZES
+  // ──────────────────────────────────────────────────────────────────────
+
+  &--sm {
+    padding: 2px 6px;
+    font-size: 11px;
+  }
+
+  &--lg {
+    padding: $spacing-sm $spacing-lg;
+    font-size: $font-size-sm;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // ICON SUPPORT
+  // ──────────────────────────────────────────────────────────────────────
+
+  &__icon {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,13 @@
+@import './variables.scss';
+@import './mixins.scss';
+@import './base.scss';
+
+// ============================================================================
+// APPLICATION STYLES
+// ============================================================================
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $color-bg;
+}

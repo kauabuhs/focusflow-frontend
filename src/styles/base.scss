@@ -1,0 +1,255 @@
+@import './variables.scss';
+@import './mixins.scss';
+
+// ============================================================================
+// RESET & NORMALIZATION
+// ============================================================================
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @include body-text;
+  background-color: $color-bg;
+  font-family: $font-family-base;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: $font-family-base;
+}
+
+// ============================================================================
+// TYPOGRAPHY
+// ============================================================================
+
+h1 {
+  @include heading-1;
+}
+
+h2 {
+  @include heading-2;
+}
+
+h3 {
+  @include heading-3;
+}
+
+h4 {
+  @include heading-4;
+}
+
+h5,
+h6 {
+  @include heading-4;
+}
+
+p {
+  @include body-text;
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+small {
+  @include body-small;
+}
+
+a {
+  color: $color-primary;
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $color-primary-dark;
+  }
+
+  &:focus {
+    @include focus-outline;
+    border-radius: $radius-sm;
+  }
+}
+
+// ============================================================================
+// LISTS
+// ============================================================================
+
+ul,
+ol {
+  margin-bottom: $spacing-lg;
+  padding-left: $spacing-2xl;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+li {
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// ============================================================================
+// IMAGES
+// ============================================================================
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ============================================================================
+// FORM ELEMENTS
+// ============================================================================
+
+input,
+textarea,
+select {
+  @include input-base;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+select {
+  cursor: pointer;
+}
+
+label {
+  @include label-text;
+  display: block;
+  margin-bottom: $spacing-md;
+}
+
+// ============================================================================
+// BUTTONS
+// ============================================================================
+
+button,
+[role='button'] {
+  @include button-base;
+  @include button-primary;
+}
+
+// ============================================================================
+// CODE BLOCKS
+// ============================================================================
+
+code,
+pre {
+  font-family: $font-family-mono;
+  background-color: $color-gray-100;
+  border-radius: $radius-sm;
+  color: $color-gray-900;
+}
+
+code {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-sm;
+}
+
+pre {
+  padding: $spacing-lg;
+  overflow-x: auto;
+  margin-bottom: $spacing-lg;
+
+  code {
+    background-color: transparent;
+    padding: 0;
+  }
+}
+
+// ============================================================================
+// TABLES
+// ============================================================================
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: $spacing-lg;
+}
+
+th {
+  @include label-text;
+  text-align: left;
+  border-bottom: 2px solid $color-border;
+  padding: $spacing-md $spacing-lg;
+}
+
+td {
+  @include body-text;
+  border-bottom: 1px solid $color-border;
+  padding: $spacing-md $spacing-lg;
+}
+
+// ============================================================================
+// ACCESSIBILITY
+// ============================================================================
+
+::selection {
+  background-color: $color-primary;
+  color: $color-white;
+}
+
+:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: more) {
+  body {
+    color: $color-black;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ============================================================================
+// PRINT STYLES
+// ============================================================================
+
+@media print {
+  body {
+    background-color: $color-white;
+    color: $color-black;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  button {
+    display: none;
+  }
+}

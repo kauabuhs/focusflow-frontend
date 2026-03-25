@@ -97,7 +97,7 @@ const router = createRouter({
 // ─── Route Guards ─────────────────────────────────────────────────────────────
 
 // Update document title
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   document.title = (to.meta.title as string) || 'FocusFlow'
   next()
 })

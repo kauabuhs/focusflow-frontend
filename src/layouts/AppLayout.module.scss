@@ -1,0 +1,356 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+// ============================================================================
+// APP LAYOUT - BEM BLOCK
+// ============================================================================
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  background-color: $color-bg;
+
+  // ──────────────────────────────────────────────────────────────────────
+  // SIDEBAR ELEMENT
+  // ──────────────────────────────────────────────────────────────────────
+
+  &__sidebar {
+    width: 256px; // 64 = 16 * 4, 256px = 16rem
+    background-color: $color-white;
+    border-right: 1px solid $color-border;
+    @include flex-column;
+    box-shadow: $shadow-sm;
+    transition: all $transition-base;
+
+    @include breakpoint-down('md') {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      z-index: 50;
+      transform: translateX(-100%);
+      
+      &--open {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  // ──── Brand Section ────
+  &__brand {
+    padding: $spacing-xl $spacing-lg;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__brand-title {
+    @include heading-3;
+    color: $color-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__brand-subtitle {
+    @include body-small;
+    color: $color-text-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  // ──── Navigation ────
+  &__nav {
+    flex: 1;
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    overflow-y: auto;
+    
+    &-item {
+      @include button-base;
+      width: 100%;
+      justify-content: flex-start;
+      padding: $spacing-md $spacing-lg;
+      border-radius: $radius-md;
+      transition: all $transition-base;
+      background-color: transparent;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      
+      &:hover {
+        background-color: $color-gray-100;
+        color: $color-text;
+      }
+
+      &--active {
+        background-color: $color-primary;
+        background-color: rgba($color-primary, 0.1);
+        color: $color-primary;
+        border-left: 2px solid $color-primary;
+        
+        &:hover {
+          background-color: rgba($color-primary, 0.15);
+        }
+      }
+    }
+
+    &-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    &-label {
+      flex: 1;
+      text-align: left;
+    }
+  }
+
+  // ──── Footer ────
+  &__sidebar-footer {
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    border-top: 1px solid $color-border;
+  }
+
+  &__focus-btn {
+    @include button-base;
+    @include button-primary;
+    width: 100%;
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    color: $color-white;
+    font-weight: $font-weight-semibold;
+    box-shadow: $shadow-md;
+    transition: all $transition-base;
+
+    &:hover:not(:disabled) {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+
+  &__user-profile {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    background-color: transparent;
+    transition: all $transition-base;
+    width: 100%;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+  }
+
+  &__user-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  &__user-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+  }
+
+  &__user-name {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-text;
+    @include text-truncate;
+  }
+
+  &__user-plan {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    @include text-truncate;
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // MAIN CONTENT AREA
+  // ──────────────────────────────────────────────────────────────────────
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: $color-bg-secondary;
+  }
+
+  // ──── Top Bar/Header ────
+  &__header {
+    height: 64px; // h-16 = 4rem = 64px
+    background-color: $color-white;
+    border-bottom: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 $spacing-2xl;
+    gap: $spacing-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__header-search {
+    flex: 1;
+    max-width: 320px; // max-w-md
+  }
+
+  &__search-input {
+    @include input-base;
+    width: 100%;
+    height: 40px;
+    padding-left: 36px;
+    background-color: $color-gray-100;
+    border: none;
+    font-size: $font-size-sm;
+    padding: 8px 12px 8px 36px;
+    position: relative;
+
+    &:focus {
+      background-color: $color-white;
+      border: 1px solid $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+    }
+
+    &::placeholder {
+      color: $color-text-light;
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: $color-text-light;
+    pointer-events: none;
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__icon-btn {
+    @include button-ghost;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-md;
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    color: $color-text-secondary;
+  }
+
+  &__notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 20px;
+    height: 20px;
+    background-color: #ef4444; // Red color
+    color: $color-white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+  }
+
+  &__divider {
+    width: 1px;
+    height: 24px;
+    background-color: $color-border;
+  }
+
+  &__header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-md;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // CONTENT AREA
+  // ──────────────────────────────────────────────────────────────────────
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  &__content-wrapper {
+    padding: $spacing-2xl;
+
+    @include breakpoint-down('md') {
+      padding: $spacing-xl;
+    }
+
+    @include breakpoint-down('sm') {
+      padding: $spacing-lg;
+    }
+  }
+}
+
+// ============================================================================
+// SEARCH WRAPPER (Relative Positioning)
+// ============================================================================
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+
+// ============================================================================
+// NOTIFICATION WRAPPER (Relative Positioning)
+// ============================================================================
+
+.notification-wrapper {
+  position: relative;
+}
+
+// ============================================================================
+// RESPONSIVE ADJUSTMENTS
+// ============================================================================
+
+@include breakpoint-down('md') {
+  .app-layout {
+    &__header {
+      padding: 0 $spacing-lg;
+    }
+
+    &__header-search {
+      max-width: 200px;
+    }
+
+    &__main {
+      flex: 1;
+    }
+  }
+}

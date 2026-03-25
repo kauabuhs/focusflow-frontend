@@ -13,25 +13,9 @@ import {
   Play,
   Search,
   LogOut,
+  ChevronDown,
 } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import styles from './AppLayout.module.scss'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,6 +49,9 @@ const route = useRoute()
 const router = useRouter()
 const searchQuery = ref('')
 const notificationCount = ref(3)
+const dropdownOpen = ref(false)
+const userDropdownOpen = ref(false)
+
 const currentUser = ref<User>({
   name: 'Alex Rivera',
   plan: 'Pro Account',
@@ -81,6 +68,8 @@ const hasNotifications = computed(() => notificationCount.value > 0)
 
 function navigate(to: string): void {
   router.push(to)
+  dropdownOpen.value = false
+  userDropdownOpen.value = false
 }
 
 function startFocusSession(): void {
@@ -96,168 +85,281 @@ function handleSearch(e: KeyboardEvent): void {
 function logout(): void {
   console.log('Logout')
 }
+
+function toggleDropdown(): void {
+  dropdownOpen.value = !dropdownOpen.value
+  userDropdownOpen.value = false
+}
+
+function toggleUserDropdown(): void {
+  userDropdownOpen.value = !userDropdownOpen.value
+  dropdownOpen.value = false
+}
 </script>
 
 <template>
-  <TooltipProvider>
-    <div class="flex h-screen bg-slate-50 dark:bg-slate-950">
-      <!-- ═══════════════════════════════════════ SIDEBAR ═══════════════════════════════════════ -->
-      <aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shadow-sm">
-        
-        <!-- Brand -->
-        <div class="px-6 py-8 border-b border-slate-200 dark:border-slate-800">
-          <div class="flex flex-col gap-1">
-            <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">FocusFlow</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Productivity Platform</p>
+  <div :class="styles['app-layout']">
+    <!-- ═════════════════════════════════════ SIDEBAR ═════════════════════════════════════ -->
+    <aside :class="styles['app-layout__sidebar']">
+      
+      <!-- Brand -->
+      <div :class="styles['app-layout__brand']">
+        <h1 :class="styles['app-layout__brand-title']">FocusFlow</h1>
+        <p :class="styles['app-layout__brand-subtitle']">Productivity Platform</p>
+      </div>
+
+      <!-- Navigation -->
+      <nav :class="styles['app-layout__nav']">
+        <button
+          v-for="item in navItems"
+          :key="item.to"
+          @click="navigate(item.to)"
+          :class="[
+            styles['app-layout__nav-item'],
+            isActive(item.to) && styles['app-layout__nav-item--active']
+          ]"
+          :title="item.label"
+        >
+          <component :is="item.icon" :class="styles['app-layout__nav-icon']" />
+          <span :class="styles['app-layout__nav-label']">{{ item.label }}</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div :class="styles['app-layout__sidebar-footer']">
+        <!-- Focus Session Button -->
+        <button
+          @click="startFocusSession"
+          :class="styles['app-layout__focus-btn']"
+        >
+          <Play class="w-4 h-4" />
+          Focus Session
+        </button>
+
+        <!-- User Profile Dropdown -->
+        <div>
+          <button
+            @click="toggleDropdown"
+            :class="styles['app-layout__user-profile']"
+          >
+            <!-- Avatar -->
+            <div :class="styles['app-layout__user-avatar']">
+              <div style="
+                width: 100%;
+                height: 100%;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+              ">
+                {{ currentUser.initials }}
+              </div>
+            </div>
+
+            <!-- User Info -->
+            <div :class="styles['app-layout__user-info']">
+              <p :class="styles['app-layout__user-name']">{{ currentUser.name }}</p>
+              <p :class="styles['app-layout__user-plan']">{{ currentUser.plan }}</p>
+            </div>
+
+            <ChevronDown style="width: 16px; height: 16px; flex-shrink: 0;" />
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div v-if="dropdownOpen" style="
+            position: absolute;
+            bottom: -120px;
+            left: 16px;
+            right: 16px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            overflow: hidden;
+          ">
+            <button
+              @click="navigate('/settings')"
+              style="
+                width: 100%;
+                padding: 12px 16px;
+                border: none;
+                background: transparent;
+                text-align: left;
+                font-size: 14px;
+                cursor: pointer;
+                transition: background-color 150ms;
+              "
+              @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#f3f4f6'"
+              @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+            >
+              <Settings style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+              Configurações
+            </button>
+            <div style="height: 1px; background-color: #e5e7eb;" />
+            <button
+              @click="logout"
+              style="
+                width: 100%;
+                padding: 12px 16px;
+                border: none;
+                background: transparent;
+                text-align: left;
+                font-size: 14px;
+                cursor: pointer;
+                color: #ef4444;
+                transition: background-color 150ms;
+              "
+              @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2'"
+              @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+            >
+              <LogOut style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+              Sair
+            </button>
           </div>
         </div>
+      </div>
+    </aside>
 
-        <!-- Navigation -->
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          <Tooltip v-for="item in navItems" :key="item.to">
-            <TooltipTrigger as-child>
-              <button
-                @click="navigate(item.to)"
-                :class="[
-                  'w-full px-4 py-3 rounded-lg flex items-center gap-3 transition-all duration-200 text-sm font-medium',
-                  isActive(item.to)
-                    ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                ]"
-              >
-                <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
-                <span class="flex-1 text-left">{{ item.label }}</span>
-                <div v-if="isActive(item.to)" class="w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" class="hidden md:block">
-              {{ item.label }}
-            </TooltipContent>
-          </Tooltip>
-        </nav>
-
-        <!-- Footer -->
-        <div class="px-4 py-4 space-y-3 border-t border-slate-200 dark:border-slate-800">
-          <!-- Focus Session Button -->
-          <Button
-            @click="startFocusSession"
-            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            <Play class="w-4 h-4 mr-2" />
-            Focus Session
-          </Button>
-
-          <!-- User Profile -->
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <button class="w-full p-3 rounded-lg flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors duration-200">
-                <Avatar class="w-9 h-9">
-                  <AvatarImage v-if="currentUser.avatarUrl" :src="currentUser.avatarUrl" :alt="currentUser.name" />
-                  <AvatarFallback class="text-xs font-semibold bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-                    {{ currentUser.initials }}
-                  </AvatarFallback>
-                </Avatar>
-                <div class="flex-1 text-left min-w-0">
-                  <p class="text-sm font-medium text-slate-900 dark:text-white truncate">{{ currentUser.name }}</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ currentUser.plan }}</p>
-                </div>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" class="w-52">
-              <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem @click="navigate('/settings')">
-                <Settings class="w-4 h-4 mr-2" /> Configurações
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem @click="logout" class="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950">
-                <LogOut class="w-4 h-4 mr-2" /> Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </aside>
-
-      <!-- ═══════════════════════════════════════ MAIN ═══════════════════════════════════════ -->
-      <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- ═════════════════════════════════════ MAIN ═════════════════════════════════════ -->
+    <div :class="styles['app-layout__main']">
+      
+      <!-- Top Bar/Header -->
+      <header :class="styles['app-layout__header']">
         
-        <!-- Top Bar -->
-        <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 gap-4 shadow-sm">
-          
-          <!-- Search -->
-          <div class="flex-1 max-w-md">
-            <div class="relative">
-              <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <Input
-                v-model="searchQuery"
-                placeholder="Buscar tarefas..."
-                @keydown="handleSearch"
-                class="pl-10 h-10 bg-slate-100 dark:bg-slate-800 border-0 text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500"
-              />
+        <!-- Search -->
+        <div :class="styles['search-wrapper']">
+          <Search :class="styles['app-layout__search-icon']" />
+          <input
+            v-model="searchQuery"
+            placeholder="Buscar tarefas..."
+            @keydown="handleSearch"
+            :class="styles['app-layout__search-input']"
+          />
+        </div>
+
+        <!-- Right Actions -->
+        <div :class="styles['app-layout__header-actions']">
+          <!-- Notifications Button -->
+          <button :class="styles['app-layout__icon-btn']">
+            <div style="position: relative;">
+              <Bell :class="styles['app-layout__icon']" />
+              <div
+                v-if="hasNotifications"
+                :class="styles['app-layout__notification-badge']"
+              >
+                {{ notificationCount }}
+              </div>
+            </div>
+          </button>
+
+          <!-- Help Button -->
+          <button :class="styles['app-layout__icon-btn']">
+            <HelpCircle :class="styles['app-layout__icon']" />
+          </button>
+
+          <!-- Divider -->
+          <div :class="styles['app-layout__divider']" />
+
+          <!-- User Avatar Dropdown -->
+          <div style="position: relative;">
+            <button
+              @click="toggleUserDropdown"
+              :class="styles['app-layout__header-avatar']"
+            >
+              <div style="
+                width: 100%;
+                height: 100%;
+                border-radius: 6px;
+                background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+              ">
+                {{ currentUser.initials }}
+              </div>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div v-if="userDropdownOpen" style="
+              position: absolute;
+              top: 100%;
+              right: 0;
+              margin-top: 8px;
+              background: white;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+              z-index: 100;
+              min-width: 200px;
+              overflow: hidden;
+            ">
+              <div style="
+                padding: 12px 16px;
+                border-bottom: 1px solid #e5e7eb;
+                font-weight: 500;
+                font-size: 14px;
+                color: #111827;
+              ">
+                {{ currentUser.name }}
+              </div>
+              <button
+                @click="navigate('/settings')"
+                style="
+                  width: 100%;
+                  padding: 12px 16px;
+                  border: none;
+                  background: transparent;
+                  text-align: left;
+                  font-size: 14px;
+                  cursor: pointer;
+                  color: #111827;
+                  transition: background-color 150ms;
+                "
+                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#f3f4f6'"
+                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+              >
+                <Settings style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+                Configurações
+              </button>
+              <div style="height: 1px; background-color: #e5e7eb;" />
+              <button
+                @click="logout"
+                style="
+                  width: 100%;
+                  padding: 12px 16px;
+                  border: none;
+                  background: transparent;
+                  text-align: left;
+                  font-size: 14px;
+                  cursor: pointer;
+                  color: #ef4444;
+                  transition: background-color 150ms;
+                "
+                @mouseenter="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = '#fef2f2'"
+                @mouseleave="(e) => (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'"
+              >
+                <LogOut style="width: 16px; height: 16px; display: inline; margin-right: 8px;" />
+                Sair
+              </button>
             </div>
           </div>
+        </div>
+      </header>
 
-          <!-- Right Actions -->
-          <div class="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="icon" @click="navigate('/notifications')" class="h-10 w-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                  <div class="relative">
-                    <Bell class="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    <Badge v-if="hasNotifications" class="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs bg-red-500 text-white">
-                      {{ notificationCount }}
-                    </Badge>
-                  </div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Notificações</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="icon" @click="navigate('/help')" class="h-10 w-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-                  <HelpCircle class="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Ajuda</TooltipContent>
-            </Tooltip>
-
-            <div class="w-px h-6 bg-slate-200 dark:bg-slate-700" />
-
-            <!-- User Avatar (topbar) -->
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <button class="h-10 w-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                  <Avatar class="h-10 w-10">
-                    <AvatarImage v-if="currentUser.avatarUrl" :src="currentUser.avatarUrl" :alt="currentUser.name" />
-                    <AvatarFallback class="text-xs font-semibold bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-                      {{ currentUser.initials }}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" class="w-52">
-                <DropdownMenuLabel>{{ currentUser.name }}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem @click="navigate('/settings')">
-                  <Settings class="w-4 h-4 mr-2" /> Configurações
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem @click="logout" class="text-red-600 dark:text-red-400">
-                  <LogOut class="w-4 h-4 mr-2" /> Sair
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-
-        <!-- Content Area -->
-        <main class="flex-1 overflow-y-auto">
-          <div class="p-8">
-            <RouterView />
-          </div>
-        </main>
-      </div>
+      <!-- Content Area -->
+      <main :class="styles['app-layout__content']">
+        <div :class="styles['app-layout__content-wrapper']">
+          <RouterView />
+        </div>
+      </main>
     </div>
-  </TooltipProvider>
+  </div>
 </template>

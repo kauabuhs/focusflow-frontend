@@ -1,0 +1,334 @@
+@import '@/styles/variables.scss';
+@import '@/styles/mixins.scss';
+
+.analytics-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.page-title {
+  @include heading-2;
+  margin: 0;
+}
+
+.page-sub {
+  @include body-small;
+  color: $color-text-secondary;
+  margin: $spacing-xs 0 0;
+}
+
+.section-title {
+  @include body-text;
+  font-weight: $font-weight-semibold;
+  color: $color-text;
+}
+
+.section-sub {
+  @include body-small;
+  color: $color-text-secondary;
+  margin-top: $spacing-xs;
+}
+
+// ============================================================================
+// FOCUS HOURS CARD
+// ============================================================================
+
+.focus-card {
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: $spacing-lg $spacing-xl 0;
+  }
+
+  &__body {
+    padding: $spacing-md $spacing-xl $spacing-xl;
+  }
+}
+
+.period-toggle {
+  display: flex;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.period-btn {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  background: $color-white;
+  border: none;
+  cursor: pointer;
+  transition: background $transition-base, color $transition-base;
+
+  &:not(:first-child) {
+    border-left: 1px solid $color-border;
+  }
+
+  &--active {
+    background: $color-primary-light;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-md;
+  height: 160px;
+  padding-top: $spacing-sm;
+}
+
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  flex: 1;
+}
+
+.bar-track {
+  width: 100%;
+  height: 130px;
+  background: $color-primary-light;
+  border-radius: $radius-md $radius-md $radius-sm $radius-sm;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 100%;
+  background: #bfdbfe;
+  border-radius: $radius-md $radius-md 0 0;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &--active {
+    background: $color-primary;
+  }
+}
+
+.bar-label {
+  @include label-text;
+  color: $color-text-secondary;
+  letter-spacing: 0.03em;
+}
+
+// ============================================================================
+// BOTTOM GRID
+// ============================================================================
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: $spacing-md;
+  align-items: start;
+
+  @include breakpoint-down('md') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================================================
+// DONUT CARD
+// ============================================================================
+
+.donut-card {
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+
+  &__header {
+    padding: $spacing-lg $spacing-xl 0;
+  }
+
+  &__body {
+    padding: $spacing-md $spacing-xl $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-xl;
+  }
+}
+
+.donut-wrap {
+  position: relative;
+}
+
+.donut-svg {
+  overflow: visible;
+}
+
+.donut-seg {
+  transition: opacity $transition-base;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.donut-center-value {
+  font-size: 28px;
+  font-weight: 900;
+  fill: #111827;
+  font-family: inherit;
+  letter-spacing: -0.04em;
+}
+
+.donut-center-label {
+  font-size: 9px;
+  font-weight: 700;
+  fill: #6b7280;
+  letter-spacing: 0.08em;
+  font-family: inherit;
+}
+
+.donut-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  @include body-small;
+  color: $color-text;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+}
+
+.legend-pct {
+  font-weight: $font-weight-semibold;
+  color: $color-text;
+  min-width: 40px;
+  text-align: right;
+}
+
+// ============================================================================
+// TREND CARD
+// ============================================================================
+
+.trend-card {
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__body {
+    padding: $spacing-lg $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+}
+
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  background: $color-primary-light;
+  color: $color-primary;
+  padding: $spacing-xs $spacing-md;
+  border-radius: 999px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.trend-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.trend-svg {
+  width: 100%;
+  height: 140px;
+}
+
+.trend-line {
+  filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.1));
+}
+
+.trend-dot {
+  filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.2));
+}
+
+.trend-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.trend-label {
+  @include label-text;
+  color: $color-text-secondary;
+}
+
+.trend-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background: $color-gray-50;
+  border-radius: $radius-md;
+}
+
+.trend-stat {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  align-items: center;
+
+  &__label {
+    @include label-text;
+    color: $color-text-secondary;
+  }
+
+  &__value {
+    @include body-text;
+    font-weight: $font-weight-semibold;
+    color: $color-text;
+  }
+}
+
+.trend-stat-divider {
+  width: 1px;
+  height: 30px;
+  background: $color-border;
+}
